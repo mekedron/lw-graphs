@@ -1,0 +1,140 @@
+<html>
+<head>
+	<script src="libs/jquery-1.11.0.min.js"></script>
+	<script src="libs/jquery-migrate-1.2.1.min.js"></script>
+	<meta charset="utf-8">
+	<style>
+	#matr input, #result input {
+		width: 32px;
+		height: 32px;
+		text-align: center;
+	}
+	</style>
+</head>
+<body>
+	Матрица смежности <input id="count" value="10">:<br><br>
+	<div id="matr">
+		<input id="cell_0_0" value="0"><input id="cell_0_1" value="10"><input id="cell_0_2" value="0"><input id="cell_0_3" value="50"><input id="cell_0_4" value="0"><input id="cell_0_5" value="0"><input id="cell_0_6" value="0"><input id="cell_0_7" value="0"><input id="cell_0_8" value="0"><input id="cell_0_9" value="0"><br><input id="cell_1_0" value="0"><input id="cell_1_1" value="0"><input id="cell_1_2" value="40"><input id="cell_1_3" value="0"><input id="cell_1_4" value="0"><input id="cell_1_5" value="20"><input id="cell_1_6" value="0"><input id="cell_1_7" value="0"><input id="cell_1_8" value="0"><input id="cell_1_9" value="30"><br><input id="cell_2_0" value="0"><input id="cell_2_1" value="0"><input id="cell_2_2" value="0"><input id="cell_2_3" value="30"><input id="cell_2_4" value="0"><input id="cell_2_5" value="10"><input id="cell_2_6" value="0"><input id="cell_2_7" value="30"><input id="cell_2_8" value="0"><input id="cell_2_9" value="0"><br><input id="cell_3_0" value="50"><input id="cell_3_1" value="0"><input id="cell_3_2" value="30"><input id="cell_3_3" value="0"><input id="cell_3_4" value="0"><input id="cell_3_5" value="10"><input id="cell_3_6" value="0"><input id="cell_3_7" value="0"><input id="cell_3_8" value="0"><input id="cell_3_9" value="0"><br><input id="cell_4_0" value="0"><input id="cell_4_1" value="0"><input id="cell_4_2" value="0"><input id="cell_4_3" value="10"><input id="cell_4_4" value="0"><input id="cell_4_5" value="0"><input id="cell_4_6" value="0"><input id="cell_4_7" value="0"><input id="cell_4_8" value="0"><input id="cell_4_9" value="0"><br><input id="cell_5_0" value="0"><input id="cell_5_1" value="20"><input id="cell_5_2" value="0"><input id="cell_5_3" value="0"><input id="cell_5_4" value="40"><input id="cell_5_5" value="0"><input id="cell_5_6" value="15"><input id="cell_5_7" value="0"><input id="cell_5_8" value="0"><input id="cell_5_9" value="0"><br><input id="cell_6_0" value="0"><input id="cell_6_1" value="20"><input id="cell_6_2" value="0"><input id="cell_6_3" value="0"><input id="cell_6_4" value="0"><input id="cell_6_5" value="15"><input id="cell_6_6" value="0"><input id="cell_6_7" value="0"><input id="cell_6_8" value="0"><input id="cell_6_9" value="0"><br><input id="cell_7_0" value="0"><input id="cell_7_1" value="0"><input id="cell_7_2" value="0"><input id="cell_7_3" value="0"><input id="cell_7_4" value="0"><input id="cell_7_5" value="0"><input id="cell_7_6" value="0"><input id="cell_7_7" value="0"><input id="cell_7_8" value="0"><input id="cell_7_9" value="50"><br><input id="cell_8_0" value="0"><input id="cell_8_1" value="0"><input id="cell_8_2" value="0"><input id="cell_8_3" value="0"><input id="cell_8_4" value="0"><input id="cell_8_5" value="0"><input id="cell_8_6" value="0"><input id="cell_8_7" value="0"><input id="cell_8_8" value="0"><input id="cell_8_9" value="20"><br><input id="cell_9_0" value="0"><input id="cell_9_1" value="0"><input id="cell_9_2" value="0"><input id="cell_9_3" value="0"><input id="cell_9_4" value="0"><input id="cell_9_5" value="0"><input id="cell_9_6" value="5"><input id="cell_9_7" value="0"><input id="cell_9_8" value="20"><input id="cell_9_9" value="0"><br>
+	</div><br>
+	<input type="button" id="ford" value="Выполнить алгоритм"><br><br>
+	<div id="result">
+	</div>
+	<script>
+		cnt = 10;
+		mat = new Array(cnt);
+		for (i = 0; i < cnt; i++)
+			mat[i] = new Array(cnt);
+		function drawField(cnt, mat, block, incr) {
+			for (i=0; i < cnt; i++) {
+				for (j=0; j < cnt; j++) {
+					vv = mat[i][j];
+					if (incr) vv++;
+					if (mat[i][j] >= 1000000) vv = "&#8734;";
+					$(block).append("<input id=\"cell_"+i+"_"+j+"\" value=\""+vv+"\">");
+				}
+				$(block).append("<br>");
+			}
+		}
+		function init() {
+			$("#matr").html("");
+			cnt = $("#count").val();
+			mat = new Array(cnt);
+			for (i=0; i < cnt; i++) {
+				mat[i] = new Array(cnt);
+				for (j=0; j < cnt; j++)
+					mat[i][j] = 0;
+			}
+			drawField(cnt, mat, "#matr");
+		}
+		function fillArray(cnt, mat) {
+			mat = new Array(cnt);
+			for (i=0; i < cnt; i++) {
+				mat[i] = new Array(cnt);
+				for (j=0; j < cnt; j++) {
+					mat[i][j] = parseInt($("#cell_"+i+"_"+j).val());
+				}
+			}
+			return mat;
+		}
+		$("#count").keyup(function(){init();});
+		met = new Array(cnt);
+		pos = new Array(cnt);
+		put = new Array(cnt);
+		function ford(cnt, mat) {
+			res = mat;
+			put = new Array(cnt);
+			for (i = 0; i < cnt; i++) {
+				put[i] = new Array(cnt);
+				for (j = 0; j < cnt; j++) {
+					put[i][j] = j;
+				}
+			}
+			for (i = 0; i<cnt; i++)
+				for (j = 0; j<cnt; j++)
+					if (mat[i][j] == 0)
+						mat[i][j] = 1000000;
+			for (k = 0; k < cnt; k++) {
+				for (i = 0; i < cnt; i++) {
+					for (j = 0; j < cnt; j++) {
+						if (res[i][j] > res[i][k] + res[k][j]) {
+							res[i][j] = res[i][k] + res[k][j];
+							put[i][j] = k;
+						}
+					}
+				}
+				$("#result").append("Шаг "+(k+1)+":<br>");
+				drawField(cnt, res, "#result");
+				$("#result").append("<br>");
+				drawField(cnt, put, "#result", true);
+				$("#result").append("<br>");
+			}
+			for (i = 0; i < cnt; i++) {
+				//res[i][i] = 0;
+			}
+			return new Array(res, put);
+		}
+		$("#ford").click(function(){
+			console.time('exec time');
+			
+			console.time('clear results');
+			$("#result").html("");
+			console.timeEnd('clear results');
+			
+			console.time('fill array');
+			mat = fillArray(cnt, mat);
+			console.timeEnd('fill array');
+			
+			console.time('ford time');
+			rp = ford(cnt, mat);
+			console.timeEnd('ford time');
+			
+			console.time('print');
+			for (n = 0; n < cnt; n++) {
+				for (i = 0; i < cnt; i++) {
+					str = "<br>d<sub>"+(n+1)+" "+(i+1)+"</sub> = "+rp[0][n][i]+" ("+(i+1)+" < ";
+					k = i;
+					p = k;
+					//n = 0;
+					w = 0;
+					put = new Array();
+					do {
+						put[w] = (rp[1][n][k]+1)+" < ";
+						w++;
+						p = k;
+						k = rp[1][n][k];
+					} while (p != k);
+					put[w-1] = (n+1)+")";
+					for (j = 0; j < w; j++) {
+						str += put[j];
+					}
+					$("#result").append(str);
+				}
+				$("#result").append("<br>");
+			}
+			console.timeEnd('print');
+			
+			console.timeEnd('exec time');
+		});
+	</script>
+</body>
+</html>

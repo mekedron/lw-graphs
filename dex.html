@@ -1,0 +1,141 @@
+<html>
+<head>
+	<script src="libs/jquery-1.11.0.min.js"></script>
+	<script src="libs/jquery-migrate-1.2.1.min.js"></script>
+	<meta charset="utf-8">
+	<style>
+	#matr input {
+		width: 32px;
+		height: 32px;
+		text-align: center;
+	}
+	</style>
+</head>
+<body>
+	Матрица смежности <input id="count" value="10">:<br><br>
+	<div id="matr">
+		<input id="cell_0_0" value="0"><input id="cell_0_1" value="0"><input id="cell_0_2" value="10"><input id="cell_0_3" value="0"><input id="cell_0_4" value="0"><input id="cell_0_5" value="0"><input id="cell_0_6" value="20"><input id="cell_0_7" value="0"><input id="cell_0_8" value="0"><input id="cell_0_9" value="0"><br><input id="cell_1_0" value="0"><input id="cell_1_1" value="0"><input id="cell_1_2" value="20"><input id="cell_1_3" value="10"><input id="cell_1_4" value="20"><input id="cell_1_5" value="0"><input id="cell_1_6" value="0"><input id="cell_1_7" value="0"><input id="cell_1_8" value="0"><input id="cell_1_9" value="0"><br><input id="cell_2_0" value="10"><input id="cell_2_1" value="20"><input id="cell_2_2" value="0"><input id="cell_2_3" value="0"><input id="cell_2_4" value="0"><input id="cell_2_5" value="10"><input id="cell_2_6" value="0"><input id="cell_2_7" value="0"><input id="cell_2_8" value="0"><input id="cell_2_9" value="0"><br><input id="cell_3_0" value="0"><input id="cell_3_1" value="10"><input id="cell_3_2" value="0"><input id="cell_3_3" value="0"><input id="cell_3_4" value="5"><input id="cell_3_5" value="0"><input id="cell_3_6" value="0"><input id="cell_3_7" value="0"><input id="cell_3_8" value="0"><input id="cell_3_9" value="15"><br><input id="cell_4_0" value="0"><input id="cell_4_1" value="20"><input id="cell_4_2" value="0"><input id="cell_4_3" value="5"><input id="cell_4_4" value="0"><input id="cell_4_5" value="30"><input id="cell_4_6" value="0"><input id="cell_4_7" value="0"><input id="cell_4_8" value="0"><input id="cell_4_9" value="0"><br><input id="cell_5_0" value="0"><input id="cell_5_1" value="0"><input id="cell_5_2" value="10"><input id="cell_5_3" value="0"><input id="cell_5_4" value="30"><input id="cell_5_5" value="0"><input id="cell_5_6" value="20"><input id="cell_5_7" value="0"><input id="cell_5_8" value="100"><input id="cell_5_9" value="0"><br><input id="cell_6_0" value="20"><input id="cell_6_1" value="0"><input id="cell_6_2" value="0"><input id="cell_6_3" value="0"><input id="cell_6_4" value="0"><input id="cell_6_5" value="20"><input id="cell_6_6" value="0"><input id="cell_6_7" value="10"><input id="cell_6_8" value="0"><input id="cell_6_9" value="0"><br><input id="cell_7_0" value="0"><input id="cell_7_1" value="0"><input id="cell_7_2" value="0"><input id="cell_7_3" value="0"><input id="cell_7_4" value="0"><input id="cell_7_5" value="0"><input id="cell_7_6" value="10"><input id="cell_7_7" value="0"><input id="cell_7_8" value="20"><input id="cell_7_9" value="0"><br><input id="cell_8_0" value="0"><input id="cell_8_1" value="0"><input id="cell_8_2" value="0"><input id="cell_8_3" value="0"><input id="cell_8_4" value="0"><input id="cell_8_5" value="100"><input id="cell_8_6" value="0"><input id="cell_8_7" value="20"><input id="cell_8_8" value="0"><input id="cell_8_9" value="40"><br><input id="cell_9_0" value="0"><input id="cell_9_1" value="0"><input id="cell_9_2" value="0"><input id="cell_9_3" value="15"><input id="cell_9_4" value="0"><input id="cell_9_5" value="0"><input id="cell_9_6" value="0"><input id="cell_9_7" value="0"><input id="cell_9_8" value="40"><input id="cell_9_9" value="0"><br>
+	</div><br>
+	<input type="button" id="dex" value="Выполнить алгоритм">
+	<div id="result">
+	</div>
+	<script>
+		cnt = 10;
+		mat = new Array(cnt);
+		for (i = 0; i < cnt; i++) {
+			mat[i] = new Array(cnt);
+		}
+		function drawField (cnt) {
+			for (i=0; i < cnt; i++) {
+				for (j=0; j < cnt; j++) {
+					$("#matr").append("<input id=\"cell_"+i+"_"+j+"\" value=\""+mat[i][j]+"\">");
+				}
+				$("#matr").append("<br>");
+			}
+		}
+		function init() {
+			$("#matr").html("");
+			cnt = $("#count").val();
+			mat = new Array(cnt);
+			for (i=0; i < cnt; i++) {
+				mat[i] = new Array(cnt);
+				for (j=0; j < cnt; j++) {
+					mat[i][j] = 0;
+				}
+			}
+			drawField(cnt);
+		}
+		function fillArray(cnt, mat) {
+			mat = new Array(cnt);
+			for (i=0; i < cnt; i++) {
+				mat[i] = new Array(cnt);
+				for (j=0; j < cnt; j++) {
+					mat[i][j] = parseInt($("#cell_"+i+"_"+j).val());
+				}
+			}
+			return mat;
+		}
+		$("#count").keyup(function(){init();});
+		met = new Array(cnt);
+		pos = new Array(cnt);
+		put = new Array(cnt);
+		function dex(cnt, mat, met, pos, put) {
+			met[0] = 0;
+			for (i = 1; i<cnt;i++) {
+				met[i] = 1000000;
+			}
+			for (i = 0; i<cnt;i++) {
+				pos[i] = 0;
+				put[i] = 0;
+			}
+			e = false;
+			t = -1;
+			while (e == false) {
+				npos = new Array(cnt);
+				j = 0;
+				for (i = 0; i < cnt; i++) {
+					if (pos[i] == 1) {
+						continue;
+					} else {
+						npos[j] = i;
+						j++;
+					}
+				}
+				t = npos[0];
+				for (i = 0; i < j; i++) {
+					if (met[npos[i]] < met[t]) {
+						t = npos[i];
+					}
+				}
+				for (i = 0; i < cnt; i++) {
+					if (mat[t][i] > 0) {
+						if (mat[t][i] + met[t] < met[i]) {
+							met[i] = mat[t][i] + met[t];
+							put[i] = t;
+						}
+					}
+				}
+				pos[t] = 1;
+				e = true;
+				for (i = 0; i < cnt; i++) {
+					if ((pos[i] == 0) || (pos[i] == 2)) {
+						e = false;
+						break;
+					}
+				}
+			}
+		}
+		$("#dex").click(function(){
+			console.time('exec time');
+			
+			console.time('clear results');
+			$("#result").html("");
+			console.timeEnd('clear results');
+			
+			console.time('fill array');
+			mat = fillArray(cnt, mat);
+			console.timeEnd('fill array');
+			
+			console.time('dex time');
+			dex(cnt, mat, met, pos, put);
+			console.timeEnd('dex time');
+			
+			console.time('print');
+			for (i = 1; i < cnt; i++) {
+				str = "<br>d<sub>1 "+(i+1)+"</sub> = "+met[i]+" ("+(i+1)+" < ";
+				k = i;
+				while (k != 0) {
+					if (put[k] != 0) 
+						 str += (put[k]+1)+" < ";
+					else str += "1)";
+					k = put[k];
+				}
+				$("#result").append(str);
+			}
+			console.timeEnd('print');
+			
+			console.timeEnd('exec time');
+		});
+	</script>
+</body>
+</html>
